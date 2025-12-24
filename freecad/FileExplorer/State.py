@@ -14,7 +14,7 @@ import FreeCAD as App
 from .Files import duplicate_file, import_file, open_file
 from .History import History
 
-from .Qt.Core import QObject , Signal , QUrl
+from .Qt.Core import QObject, Signal, QUrl
 from .Qt.Gui import QDesktopServices
 
 
@@ -35,9 +35,7 @@ class State(QObject):
         super().__init__(parent)
         self._current_path = ""
         self._history = History()
-        self.passive_tree_root_changed.connect(
-            self.on_passive_tree_root_changed
-        )
+        self.passive_tree_root_changed.connect(self.on_passive_tree_root_changed)
 
     def get_last_path(self) -> str:
         return self._current_path or str(Path.home())

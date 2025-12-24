@@ -6,7 +6,7 @@
 FileExplorerExt: Application style.
 """
 
-from .Qt.Widgets import QApplication , QStyle
+from .Qt.Widgets import QApplication, QStyle
 from .Qt.Gui import QIcon
 
 

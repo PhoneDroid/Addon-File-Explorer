@@ -17,7 +17,7 @@ from ..State import State
 from .Tree import FileTree
 from ..Style import Icons
 
-from ..Qt.Widgets import QVBoxLayout , QStatusBar , QLineEdit , QSplitter , QToolBar , QWidget
+from ..Qt.Widgets import QVBoxLayout, QStatusBar, QLineEdit, QSplitter, QToolBar, QWidget
 from ..Qt.Core import Qt
 
 

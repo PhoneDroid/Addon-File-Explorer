@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import FreeCADGui as Gui
@@ -6,16 +5,16 @@ import FreeCADGui as Gui
 from .Explorer import Explorer
 from ..Intl import tr
 
-from ..Qt.Widgets import QDockWidget , QWidget
+from ..Qt.Widgets import QDockWidget, QWidget
 from ..Qt.Core import Qt
 
 
-class Dock ( QDockWidget ):
+class Dock(QDockWidget):
     """
     Dockable container for File Explorer.
     """
 
-    explorer : Explorer
+    explorer: Explorer
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(tr("FileExplorerExt", "File Explorer"), parent)

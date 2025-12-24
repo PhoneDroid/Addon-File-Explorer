@@ -11,8 +11,8 @@ import zipfile
 from ..Files import is_fcstd_file, is_image_file
 from ..State import State
 
-from ..Qt.Widgets import QWidget , QLabel
-from ..Qt.Core import QFileInfo , QSize , Qt
+from ..Qt.Widgets import QWidget, QLabel
+from ..Qt.Core import QFileInfo, QSize, Qt
 from ..Qt.Gui import QPixmap
 
 

@@ -13,9 +13,27 @@ from ..Intl import tr
 from ..State import State
 from ..Style import Icons
 
-from ..Qt.Widgets import QAbstractItemView , QInputDialog , QMessageBox , QListView , QLineEdit , QWidget , QMenu
-from ..Qt.Core import QItemSelectionModel , QAbstractListModel , QPersistentModelIndex , QModelIndex , QObject , QPoint , QSize , QDir , Qt
-from ..Qt.Gui import QDragEnterEvent , QDragMoveEvent , QDropEvent
+from ..Qt.Widgets import (
+    QAbstractItemView,
+    QInputDialog,
+    QMessageBox,
+    QListView,
+    QLineEdit,
+    QWidget,
+    QMenu,
+)
+from ..Qt.Core import (
+    QItemSelectionModel,
+    QAbstractListModel,
+    QPersistentModelIndex,
+    QModelIndex,
+    QObject,
+    QPoint,
+    QSize,
+    QDir,
+    Qt,
+)
+from ..Qt.Gui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 
 Role = Qt.ItemDataRole
 
@@ -79,7 +97,7 @@ class FavoritesModel(QAbstractListModel):
             "user": Icons.FavoriteDir,
         }
 
-    def rowCount(self, parent: QPersistentModelIndex | QModelIndex = QModelIndex()) -> int :
+    def rowCount(self, parent: QPersistentModelIndex | QModelIndex = QModelIndex()) -> int:
         if parent.isValid():
             return 0
         return len(self._items)
@@ -168,17 +186,13 @@ class FavoritesWidget(QListView):
     ) -> None:
         super().__init__(parent)
         self.setObjectName("FileExplorerExt_Favorites")
-        user_data = [
-            Favorite(path, name) for path, name in state.get_favorites()
-        ]
+        user_data = [Favorite(path, name) for path, name in state.get_favorites()]
         self._model = FavoritesModel(user_data, self)
         self._state = state
         self.setModel(self._model)
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
-        self.setSelectionMode(
-            QAbstractItemView.SelectionMode.SingleSelection
-        )
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.on_context_menu)
         self.setIconSize(QSize(16, 16))
@@ -192,17 +206,15 @@ class FavoritesWidget(QListView):
     def on_tree_root_changed(self, path: str) -> None:
         index = self._model.findIndex(path)
         if index and index.isValid():
-            self.selectionModel().select(
-                index, QItemSelectionModel.SelectionFlag.ClearAndSelect
-            )
+            self.selectionModel().select(index, QItemSelectionModel.SelectionFlag.ClearAndSelect)
 
     def on_activated(self, index: QModelIndex) -> None:
         if index.isValid():
             path = self._model.getItem(index.row())
-            
+
             if not path:
                 return
-            
+
             self._state.favorite_selected.emit(path.path)
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
@@ -282,7 +294,7 @@ class FavoritesWidget(QListView):
 
         if not fav:
             return
-        
+
         name = fav.name
 
         if not name:
@@ -296,12 +308,7 @@ class FavoritesWidget(QListView):
             name,
         )
 
-        if (
-            ok
-            and new_name
-            and new_name != fav.name
-            and not self._model.contains_name(new_name)
-        ):
+        if ok and new_name and new_name != fav.name and not self._model.contains_name(new_name):
             fav.name = new_name
             self._state.save_favorites(self._model.get_state())
             self._model.dataChanged.emit(index, index)
