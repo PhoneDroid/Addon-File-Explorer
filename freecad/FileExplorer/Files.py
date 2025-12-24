@@ -8,7 +8,6 @@ FileExplorerExt: File utils.
 
 import re
 import shutil
-import types
 from pathlib import Path
 
 import FreeCAD as App
@@ -17,7 +16,7 @@ import FreeCADGui as Gui
 from .Qt.Gui import QImageReader
 
 SUPPORTED_IMAGE_FORMATS = set([
-    f".{str(f, 'utf-8')}".lower()
+    f".{f.toStdString()}".lower()
     for f in QImageReader.supportedImageFormats()
 ])
 
@@ -35,11 +34,11 @@ def is_fcstd_file(file_path: str) -> bool:
     return file_path.lower().endswith(".fcstd") and Path(file_path).exists()
 
 
-def get_import_module(path: str) -> types.ModuleType | None:
+def get_import_module(path: str) -> str | None:
     """Return the module to import path if any."""
     ext = (path.split(".")[-1] or "").lower()
     modules = App.getImportType(ext)
-    if modules:
+    if modules and type(modules) == list:
         return modules[0]
     return None
 
@@ -65,6 +64,10 @@ def import_file(file_path: str) -> None:
     ext = (file_path.split(".")[-1] or "").lower()
 
     doc_name = App.ActiveDocument.Name if App.ActiveDocument else None
+    
+    if not doc_name:
+        return
+    
     if ext == "fcstd":
         Gui.insert(file_path, doc_name)
 

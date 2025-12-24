@@ -89,7 +89,7 @@ class Explorer(QWidget):
         top_toolbar = self.build_top_toolbar()
         self.status = QStatusBar(self)
 
-        splitter = QSplitter(Qt.Horizontal)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.addWidget(left_sidebar)
         splitter.addWidget(self.tree)
         splitter.setStretchFactor(0, 2)

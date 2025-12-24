@@ -35,7 +35,7 @@ class PreviewPanel(QLabel):
         self.update_preview(path)
 
     def init_ui(self) -> None:
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setVisible(False)
         self.setStyleSheet("QLabel { background-color: white; }")
 
@@ -63,8 +63,8 @@ class PreviewPanel(QLabel):
         target_width = max(self.width() - 24, 150)
         scaled = pixmap.scaled(
             QSize(target_width, target_width),
-            Qt.KeepAspectRatio,
-            Qt.SmoothTransformation,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
         )
         self.setPixmap(scaled)
         self.setVisible(True)

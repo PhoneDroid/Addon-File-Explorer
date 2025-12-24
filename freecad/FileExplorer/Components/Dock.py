@@ -10,7 +10,7 @@ from ..Qt.Widgets import QDockWidget , QWidget
 from ..Qt.Core import Qt
 
 
-class Dock(QDockWidget):
+class Dock ( QDockWidget ):
     """
     Dockable container for File Explorer.
     """
@@ -27,5 +27,4 @@ class Dock(QDockWidget):
 def show() -> None:
     window = Gui.getMainWindow()
     dock = Dock(window)
-    window.__FileExplorerExt__ = dock
-    window.addDockWidget(Qt.LeftDockWidgetArea, dock)
+    window.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock)

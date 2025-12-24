@@ -14,7 +14,7 @@ from ..State import State
 from ..Style import Icons
 
 from ..Qt.Widgets import QAbstractItemView , QInputDialog , QMessageBox , QListView , QLineEdit , QWidget , QMenu
-from ..Qt.Core import QItemSelectionModel , QAbstractListModel , QModelIndex , QObject , QPoint , QSize , QDir , Qt
+from ..Qt.Core import QItemSelectionModel , QAbstractListModel , QPersistentModelIndex , QModelIndex , QObject , QPoint , QSize , QDir , Qt
 from ..Qt.Gui import QDragEnterEvent , QDragMoveEvent , QDropEvent
 
 Role = Qt.ItemDataRole
@@ -79,14 +79,14 @@ class FavoritesModel(QAbstractListModel):
             "user": Icons.FavoriteDir,
         }
 
-    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
+    def rowCount(self, parent: QPersistentModelIndex | QModelIndex = QModelIndex()) -> int :
         if parent.isValid():
             return 0
         return len(self._items)
 
     def data(
         self,
-        index: QModelIndex,
+        index: QPersistentModelIndex | QModelIndex,
         role: int = Role.DisplayRole,
     ) -> object:
         if not index.isValid() or index.row() >= len(self._items):
@@ -150,7 +150,7 @@ class FavoritesModel(QAbstractListModel):
         return None
 
     def get_state(self) -> list[tuple[str, str]]:
-        return [(f.path, f.name) for f in self._items if f.kind == "user"]
+        return [(f.path, f.name) for f in self._items if f.kind == "user" and f.name]
 
 
 class FavoritesWidget(QListView):
@@ -199,6 +199,10 @@ class FavoritesWidget(QListView):
     def on_activated(self, index: QModelIndex) -> None:
         if index.isValid():
             path = self._model.getItem(index.row())
+            
+            if not path:
+                return
+            
             self._state.favorite_selected.emit(path.path)
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
@@ -243,7 +247,8 @@ class FavoritesWidget(QListView):
             return
 
         fav = self._model.getItem(index.row())
-        if fav.kind != "user":
+
+        if fav and fav.kind != "user":
             return
 
         menu = QMenu(self)
@@ -264,7 +269,7 @@ class FavoritesWidget(QListView):
         if not index.isValid():
             return
         fav = self._model.getItem(index.row())
-        if fav.kind == "user":
+        if fav and fav.kind == "user":
             self._model.removeItem(index.row())
             self._state.save_favorites(self._model.get_state())
 
@@ -275,12 +280,20 @@ class FavoritesWidget(QListView):
         row = index.row()
         fav = self._model.getItem(row)
 
+        if not fav:
+            return
+        
+        name = fav.name
+
+        if not name:
+            return
+
         new_name, ok = QInputDialog.getText(
             self,
             tr("FileExplorerExt", "Rename Favorite"),
             tr("FileExplorerExt", "Enter new name:"),
             QLineEdit.EchoMode.Normal,
-            fav.name,
+            name,
         )
 
         if (

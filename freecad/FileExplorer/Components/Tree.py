@@ -15,8 +15,8 @@ from ..Intl import tr
 from ..State import State
 from ..Style import Icons
 
-from ..Qt.Widgets import QAbstractItemView , QFileSystemModel , QTreeView , QMenu
-from ..Qt.Core import QModelIndex , QPoint , QObject , QDir , Qt
+from ..Qt.Widgets import QAbstractItemView , QFileSystemModel , QTreeView , QWidget , QMenu
+from ..Qt.Core import QModelIndex , QPoint , QDir , Qt
 from ..Qt.Gui import QGuiApplication
 
 Filter = QDir.Filter
@@ -28,7 +28,7 @@ class FileTree(QTreeView):
     File Tree Widget.
     """
 
-    def __init__(self, state: State, parent: QObject | None = None) -> None:
+    def __init__(self, state: State, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("FileExplorerExt_Tree")
 

@@ -6,6 +6,6 @@
 FileExplorerExt: Translation.
 """
 
-import FreeCAD as App
+from FreeCAD import Qt
 
-tr = App.Qt.translate
+tr = Qt.translate
