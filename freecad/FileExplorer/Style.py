@@ -6,13 +6,14 @@
 FileExplorerExt: Application style.
 """
 
-from ._qt import qtg, qtw
+from .Qt.Widgets import QApplication , QStyle
+from .Qt.Gui import QIcon
 
 
 class Icons:
-    standardIcon = qtw.QApplication.style().standardIcon
-    fromTheme = qtg.QIcon.fromTheme
-    pixmaps = qtw.QStyle.StandardPixmap
+    standardIcon = QApplication.style().standardIcon
+    fromTheme = QIcon.fromTheme
+    pixmaps = QStyle.StandardPixmap
 
     RootDir = standardIcon(pixmaps.SP_ComputerIcon)
     HomeDir = fromTheme("user-home", standardIcon(pixmaps.SP_DirHomeIcon))

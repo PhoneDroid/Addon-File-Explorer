@@ -11,25 +11,27 @@ from pathlib import Path
 
 import FreeCAD as App
 
-from ._files import duplicate_file, import_file, open_file
-from ._history import History
-from ._qt import qtc, qtg
+from .Files import duplicate_file, import_file, open_file
+from .History import History
+
+from .Qt.Core import QObject , Signal , QUrl
+from .Qt.Gui import QDesktopServices
 
 
-class State(qtc.QObject):
+class State(QObject):
     """
     Main State Controller.
     """
 
-    path_changed: qtc.Signal = qtc.Signal(str)
-    favorite_selected: qtc.Signal = qtc.Signal(str)
-    tree_root_changed: qtc.Signal = qtc.Signal(str)
-    passive_tree_root_changed: qtc.Signal = qtc.Signal(str)
+    path_changed: Signal = Signal(str)
+    favorite_selected: Signal = Signal(str)
+    tree_root_changed: Signal = Signal(str)
+    passive_tree_root_changed: Signal = Signal(str)
 
     _current_path: str
     _history: History
 
-    def __init__(self, parent: qtc.QObject | None = None):
+    def __init__(self, parent: QObject | None = None):
         super().__init__(parent)
         self._current_path = ""
         self._history = History()
@@ -41,8 +43,8 @@ class State(qtc.QObject):
         return self._current_path or str(Path.home())
 
     def open_with_sys_app(self, path: str) -> None:
-        url = qtc.QUrl.fromLocalFile(path)
-        qtg.QDesktopServices.openUrl(url)
+        url = QUrl.fromLocalFile(path)
+        QDesktopServices.openUrl(url)
 
     def import_file(self, path: str) -> None:
         import_file(path)

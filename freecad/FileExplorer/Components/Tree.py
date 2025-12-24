@@ -10,26 +10,29 @@ from pathlib import Path
 
 import FreeCAD as App
 
-from ._files import get_import_module, is_fcstd_file
-from ._intl import tr
-from ._qt import qtc, qtg, qtw
-from ._state import State
-from ._style import Icons
+from ..Files import get_import_module, is_fcstd_file
+from ..Intl import tr
+from ..State import State
+from ..Style import Icons
 
-Filter = qtc.QDir.Filter
-QDir = qtc.QDir
+from ..Qt.Widgets import QAbstractItemView , QFileSystemModel , QTreeView , QMenu
+from ..Qt.Core import QModelIndex , QPoint , QObject , QDir , Qt
+from ..Qt.Gui import QGuiApplication
+
+Filter = QDir.Filter
+QDir = QDir
 
 
-class FileTree(qtw.QTreeView):
+class FileTree(QTreeView):
     """
     File Tree Widget.
     """
 
-    def __init__(self, state: State, parent: qtc.QObject | None = None) -> None:
+    def __init__(self, state: State, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("FileExplorerExt_Tree")
 
-        model = qtw.QFileSystemModel(self)
+        model = QFileSystemModel(self)
 
         self._state = state
         self._model = model
@@ -42,12 +45,12 @@ class FileTree(qtw.QTreeView):
         self.setModel(model)
         self.setRootIndex(model.index(model.rootPath()))
         self.setDragEnabled(True)
-        self.setDragDropMode(qtw.QAbstractItemView.DragDropMode.DragOnly)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragOnly)
         self.hideColumn(1)
         self.hideColumn(2)
         self.setColumnWidth(0, 300)
         self.setUniformRowHeights(True)
-        self.setContextMenuPolicy(qtc.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.activated.connect(self.on_activated)
         self.clicked.connect(self.on_activated)
@@ -59,7 +62,7 @@ class FileTree(qtw.QTreeView):
         rootIndex = self._model.setRootPath(path)
         self.setRootIndex(rootIndex)
 
-    def on_double_click(self, index: qtc.QModelIndex) -> None:
+    def on_double_click(self, index: QModelIndex) -> None:
         if index.isValid():
             root = self._model.filePath(index)
             if Path(root).is_dir():
@@ -67,14 +70,14 @@ class FileTree(qtw.QTreeView):
                 self.setRootIndex(rootIndex)
                 self._state.tree_root_changed.emit(root)
 
-    def on_activated(self, index: qtc.QModelIndex) -> None:
+    def on_activated(self, index: QModelIndex) -> None:
         if index.isValid():
             path = self._model.filePath(index)
             self._state.path_changed.emit(path)
         else:
             self._state.path_changed.emit(None)
 
-    def on_context_menu(self, position: qtc.QPoint) -> None:
+    def on_context_menu(self, position: QPoint) -> None:
         index = self.indexAt(position)
         if not index.isValid():
             return
@@ -85,7 +88,7 @@ class FileTree(qtw.QTreeView):
         is_importable = not is_dir and get_import_module(file_path)
         doc = App.ActiveDocument
 
-        menu = qtw.QMenu(self)
+        menu = QMenu(self)
 
         if is_fcstd or is_importable:
             menu.addAction(
@@ -130,7 +133,7 @@ class FileTree(qtw.QTreeView):
         menu.exec(self.mapToGlobal(position))
 
     def copy_path_to_clipboard(self, path: str) -> None:
-        clipboard = qtg.QGuiApplication.clipboard()
+        clipboard = QGuiApplication.clipboard()
         clipboard.setText(path)
 
     def go_up(self) -> None:

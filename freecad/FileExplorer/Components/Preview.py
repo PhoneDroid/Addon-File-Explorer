@@ -8,19 +8,22 @@ FileExplorerExt: Preview Widget
 
 import zipfile
 
-from ._files import is_fcstd_file, is_image_file
-from ._qt import qtc, qtg, qtw
-from ._state import State
+from ..Files import is_fcstd_file, is_image_file
+from ..State import State
+
+from ..Qt.Widgets import QWidget , QLabel
+from ..Qt.Core import QFileInfo , QSize , Qt
+from ..Qt.Gui import QPixmap
 
 
-class PreviewPanel(qtw.QLabel):
+class PreviewPanel(QLabel):
     """
     Preview Widget.
     """
 
     _state: State
 
-    def __init__(self, state: State, parent: qtw.QWidget | None = None) -> None:
+    def __init__(self, state: State, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("FileExplorerExt_Preview")
         self._state = state
@@ -32,19 +35,19 @@ class PreviewPanel(qtw.QLabel):
         self.update_preview(path)
 
     def init_ui(self) -> None:
-        self.setAlignment(qtc.Qt.AlignCenter)
+        self.setAlignment(Qt.AlignCenter)
         self.setVisible(False)
         self.setStyleSheet("QLabel { background-color: white; }")
 
     def update_preview(self, file_path: str) -> None:
         self.setVisible(False)
 
-        info = qtc.QFileInfo(file_path)
+        info = QFileInfo(file_path)
         if not info.exists() or info.isDir():
             return
 
         if is_image_file(info.absoluteFilePath()):
-            pixmap = qtg.QPixmap(info.absoluteFilePath())
+            pixmap = QPixmap(info.absoluteFilePath())
             if not pixmap.isNull():
                 self.show_image_preview(pixmap)
                 return
@@ -55,18 +58,18 @@ class PreviewPanel(qtw.QLabel):
                 self.show_image_preview(pixmap)
                 return
 
-    def show_image_preview(self, pixmap: qtg.QPixmap) -> None:
+    def show_image_preview(self, pixmap: QPixmap) -> None:
         """Display image preview scaled to available width."""
         target_width = max(self.width() - 24, 150)
         scaled = pixmap.scaled(
-            qtc.QSize(target_width, target_width),
-            qtc.Qt.KeepAspectRatio,
-            qtc.Qt.SmoothTransformation,
+            QSize(target_width, target_width),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation,
         )
         self.setPixmap(scaled)
         self.setVisible(True)
 
-    def get_fcstd_preview(self, file_path: str) -> qtg.QPixmap | None:
+    def get_fcstd_preview(self, file_path: str) -> QPixmap | None:
         """Load Thumbnail.png from a FreeCAD .FCStd file if available."""
         try:
             with zipfile.ZipFile(file_path, "r") as zf:
@@ -74,7 +77,7 @@ class PreviewPanel(qtw.QLabel):
                 if thumb_name not in zf.namelist():
                     return None
                 data = zf.read(thumb_name)
-                pixmap = qtg.QPixmap()
+                pixmap = QPixmap()
                 if pixmap.loadFromData(data):
                     return pixmap
         except (zipfile.BadZipFile, OSError, KeyError):

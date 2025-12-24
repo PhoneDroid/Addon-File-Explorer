@@ -10,18 +10,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import FreeCADGui as Gui
+from .Favorites import FavoritesWidget
+from ..Intl import tr
+from .Preview import PreviewPanel
+from ..State import State
+from .Tree import FileTree
+from ..Style import Icons
 
-from ._favorites import FavoritesWidget
-from ._intl import tr
-from ._preview import PreviewPanel
-from ._qt import qtc, qtw
-from ._state import State
-from ._tree import FileTree
-from ._style import Icons
+from ..Qt.Widgets import QVBoxLayout , QStatusBar , QLineEdit , QSplitter , QToolBar , QWidget
+from ..Qt.Core import Qt
 
 
-class FileExplorerWidget(qtw.QWidget):
+class Explorer(QWidget):
     """
     Advanced File Explorer Widget.
     """
@@ -30,9 +30,9 @@ class FileExplorerWidget(qtw.QWidget):
     tree: FileTree
     preview: PreviewPanel
     favorites: FavoritesWidget
-    status: qtw.QStatusBar
+    status: QStatusBar
 
-    def __init__(self, parent: qtw.QWidget | None = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._state = State()
         self.init_ui()
@@ -46,16 +46,16 @@ class FileExplorerWidget(qtw.QWidget):
         if last_location and Path(last_location).is_dir():
             self._state.favorite_selected.emit(last_location)
 
-    def build_sidebar(self) -> qtw.QWidget:
-        container = qtw.QWidget()
-        layout = qtw.QVBoxLayout(container)
+    def build_sidebar(self) -> QWidget:
+        container = QWidget()
+        layout = QVBoxLayout(container)
         layout.addWidget(self.favorites)
         layout.addWidget(self.preview)
         layout.setContentsMargins(0, 0, 0, 0)
         return container
 
-    def build_top_toolbar(self) -> qtw.QToolBar:
-        toolbar = qtw.QToolBar(self)
+    def build_top_toolbar(self) -> QToolBar:
+        toolbar = QToolBar(self)
         toolbar.setObjectName("FileExplorerExt_ToolBar")
 
         toolbar.addAction(
@@ -74,7 +74,7 @@ class FileExplorerWidget(qtw.QWidget):
             self.tree.go_up,
         )
 
-        filter_input = qtw.QLineEdit(self)
+        filter_input = QLineEdit(self)
         filter_input.setPlaceholderText(tr("FileExplorerExt", "Filter..."))
         filter_input.textChanged.connect(self.on_filter_changed)
         toolbar.addSeparator()
@@ -87,15 +87,15 @@ class FileExplorerWidget(qtw.QWidget):
         self.favorites = FavoritesWidget(self._state, self)
         left_sidebar = self.build_sidebar()
         top_toolbar = self.build_top_toolbar()
-        self.status = qtw.QStatusBar(self)
+        self.status = QStatusBar(self)
 
-        splitter = qtw.QSplitter(qtc.Qt.Horizontal)
+        splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(left_sidebar)
         splitter.addWidget(self.tree)
         splitter.setStretchFactor(0, 2)
         splitter.setStretchFactor(1, 8)
 
-        layout = qtw.QVBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.addWidget(top_toolbar, stretch=0)
         layout.addWidget(splitter, stretch=1)
         layout.addWidget(self.status, stretch=0)
@@ -103,24 +103,3 @@ class FileExplorerWidget(qtw.QWidget):
 
     def on_filter_changed(self, text: str):
         self.tree.setNameFilter(text)
-
-
-class FileExplorerDockWidget(qtw.QDockWidget):
-    """
-    Dockable container for File Explorer.
-    """
-
-    file_explorer: FileExplorerWidget
-
-    def __init__(self, parent: qtw.QWidget | None = None) -> None:
-        super().__init__(tr("FileExplorerExt", "File Explorer"), parent)
-        self.file_explorer = FileExplorerWidget(self)
-        self.setWidget(self.file_explorer)
-        self.setObjectName("FileExplorerExt_Dock")
-
-
-def show() -> None:
-    window = Gui.getMainWindow()
-    dock = FileExplorerDockWidget(window)
-    window.__FileExplorerExt__ = dock
-    window.addDockWidget(qtc.Qt.LeftDockWidgetArea, dock)

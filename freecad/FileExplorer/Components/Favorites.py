@@ -9,12 +9,15 @@ FileExplorerExt: Favorites.
 from dataclasses import dataclass
 from pathlib import Path
 
-from ._intl import tr
-from ._qt import qtc, qtg, qtw
-from ._state import State
-from ._style import Icons
+from ..Intl import tr
+from ..State import State
+from ..Style import Icons
 
-Role = qtc.Qt.ItemDataRole
+from ..Qt.Widgets import QAbstractItemView , QInputDialog , QMessageBox , QListView , QLineEdit , QWidget , QMenu
+from ..Qt.Core import QItemSelectionModel , QAbstractListModel , QModelIndex , QObject , QPoint , QSize , QDir , Qt
+from ..Qt.Gui import QDragEnterEvent , QDragMoveEvent , QDropEvent
+
+Role = Qt.ItemDataRole
 
 import FreeCAD as App
 
@@ -39,7 +42,7 @@ RootDir = Favorite(
 )
 
 HomeDir = Favorite(
-    path=qtc.QDir.homePath(),
+    path=QDir.homePath(),
     name=tr("FileExplorerExt", "Home"),
     kind="home",
     order=1,
@@ -57,7 +60,7 @@ class DuplicatedFavoriteError(Exception):
     pass
 
 
-class FavoritesModel(qtc.QAbstractListModel):
+class FavoritesModel(QAbstractListModel):
     """
     Favorites Model.
     """
@@ -65,7 +68,7 @@ class FavoritesModel(qtc.QAbstractListModel):
     def __init__(
         self,
         user: list[Favorite],
-        parent: qtc.QObject | None = None,
+        parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
         self._items: list[Favorite] = [RootDir, HomeDir, MacrosDir] + user
@@ -76,14 +79,14 @@ class FavoritesModel(qtc.QAbstractListModel):
             "user": Icons.FavoriteDir,
         }
 
-    def rowCount(self, parent: qtc.QModelIndex = qtc.QModelIndex()) -> int:
+    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         if parent.isValid():
             return 0
         return len(self._items)
 
     def data(
         self,
-        index: qtc.QModelIndex,
+        index: QModelIndex,
         role: int = Role.DisplayRole,
     ) -> object:
         if not index.isValid() or index.row() >= len(self._items):
@@ -108,13 +111,13 @@ class FavoritesModel(qtc.QAbstractListModel):
                 raise DuplicatedFavoriteError
 
         row = len(self._items)
-        self.beginInsertRows(qtc.QModelIndex(), row, row)
+        self.beginInsertRows(QModelIndex(), row, row)
         self._items.append(fav)
         self.endInsertRows()
 
     def removeItem(self, row: int) -> None:
         if 0 <= row < len(self._items):
-            self.beginRemoveRows(qtc.QModelIndex(), row, row)
+            self.beginRemoveRows(QModelIndex(), row, row)
             del self._items[row]
             self.endRemoveRows()
 
@@ -140,7 +143,7 @@ class FavoritesModel(qtc.QAbstractListModel):
                 return True
         return False
 
-    def findIndex(self, path: str) -> qtc.QModelIndex | None:
+    def findIndex(self, path: str) -> QModelIndex | None:
         for row, fav in enumerate(self._items):
             if path == fav.path:
                 return self.index(row, 0)
@@ -150,7 +153,7 @@ class FavoritesModel(qtc.QAbstractListModel):
         return [(f.path, f.name) for f in self._items if f.kind == "user"]
 
 
-class FavoritesWidget(qtw.QListView):
+class FavoritesWidget(QListView):
     """
     Favorites View.
     """
@@ -161,7 +164,7 @@ class FavoritesWidget(qtw.QListView):
     def __init__(
         self,
         state: State,
-        parent: qtw.QWidget | None = None,
+        parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self.setObjectName("FileExplorerExt_Favorites")
@@ -174,11 +177,11 @@ class FavoritesWidget(qtw.QListView):
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
         self.setSelectionMode(
-            qtw.QAbstractItemView.SelectionMode.SingleSelection
+            QAbstractItemView.SelectionMode.SingleSelection
         )
-        self.setContextMenuPolicy(qtc.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.on_context_menu)
-        self.setIconSize(qtc.QSize(16, 16))
+        self.setIconSize(QSize(16, 16))
         self.setSpacing(2)
 
         self.activated.connect(self.on_activated)
@@ -190,23 +193,23 @@ class FavoritesWidget(qtw.QListView):
         index = self._model.findIndex(path)
         if index and index.isValid():
             self.selectionModel().select(
-                index, qtc.QItemSelectionModel.SelectionFlag.ClearAndSelect
+                index, QItemSelectionModel.SelectionFlag.ClearAndSelect
             )
 
-    def on_activated(self, index: qtc.QModelIndex) -> None:
+    def on_activated(self, index: QModelIndex) -> None:
         if index.isValid():
             path = self._model.getItem(index.row())
             self._state.favorite_selected.emit(path.path)
 
-    def dragEnterEvent(self, event: qtg.QDragEnterEvent) -> None:
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         if event.mimeData().hasUrls() or event.mimeData().hasText():
             event.acceptProposedAction()
 
-    def dragMoveEvent(self, event: qtg.QDragMoveEvent) -> None:
+    def dragMoveEvent(self, event: QDragMoveEvent) -> None:
         if event.mimeData().hasUrls() or event.mimeData().hasText():
             event.acceptProposedAction()
 
-    def dropEvent(self, event: qtg.QDropEvent) -> None:
+    def dropEvent(self, event: QDropEvent) -> None:
         mime_data = event.mimeData()
 
         # Handle URLs (from file system)
@@ -228,13 +231,13 @@ class FavoritesWidget(qtw.QListView):
             self._model.addItem(Favorite(path))
             self._state.save_favorites(self._model.get_state())
         except DuplicatedFavoriteError:
-            qtw.QMessageBox.warning(
+            QMessageBox.warning(
                 self,
                 tr("FileExplorerExt", "Duplicated"),
                 tr("FileExplorerExt", "Duplicated favorite"),
             )
 
-    def on_context_menu(self, position: qtc.QPoint) -> None:
+    def on_context_menu(self, position: QPoint) -> None:
         index = self.indexAt(position)
         if not index.isValid():
             return
@@ -243,7 +246,7 @@ class FavoritesWidget(qtw.QListView):
         if fav.kind != "user":
             return
 
-        menu = qtw.QMenu(self)
+        menu = QMenu(self)
 
         menu.addAction(
             tr("FileExplorerExt", "Rename"),
@@ -257,7 +260,7 @@ class FavoritesWidget(qtw.QListView):
 
         menu.exec(self.mapToGlobal(position))
 
-    def remove_favorite(self, index: qtc.QModelIndex) -> None:
+    def remove_favorite(self, index: QModelIndex) -> None:
         if not index.isValid():
             return
         fav = self._model.getItem(index.row())
@@ -265,18 +268,18 @@ class FavoritesWidget(qtw.QListView):
             self._model.removeItem(index.row())
             self._state.save_favorites(self._model.get_state())
 
-    def rename_favorite(self, index: qtc.QModelIndex) -> None:
+    def rename_favorite(self, index: QModelIndex) -> None:
         if not index.isValid():
             return
 
         row = index.row()
         fav = self._model.getItem(row)
 
-        new_name, ok = qtw.QInputDialog.getText(
+        new_name, ok = QInputDialog.getText(
             self,
             tr("FileExplorerExt", "Rename Favorite"),
             tr("FileExplorerExt", "Enter new name:"),
-            qtw.QLineEdit.EchoMode.Normal,
+            QLineEdit.EchoMode.Normal,
             fav.name,
         )
 
@@ -290,7 +293,7 @@ class FavoritesWidget(qtw.QListView):
             self._state.save_favorites(self._model.get_state())
             self._model.dataChanged.emit(index, index)
         else:
-            qtw.QMessageBox.warning(
+            QMessageBox.warning(
                 self,
                 tr("FileExplorerExt", "File Explorer"),
                 tr("FileExplorerExt", "Cannot rename favorite"),

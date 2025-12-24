@@ -14,11 +14,11 @@ from pathlib import Path
 import FreeCAD as App
 import FreeCADGui as Gui
 
-from ._qt import qtg
+from .Qt.Gui import QImageReader
 
 SUPPORTED_IMAGE_FORMATS = set([
     f".{str(f, 'utf-8')}".lower()
-    for f in qtg.QImageReader.supportedImageFormats()
+    for f in QImageReader.supportedImageFormats()
 ])
 
 

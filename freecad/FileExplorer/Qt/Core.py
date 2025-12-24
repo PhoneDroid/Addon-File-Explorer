@@ -2,6 +2,12 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-from . import _explorer
 
-_explorer.show()
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from PySide6.QtCore import *
+else:
+    from PySide.QtCore import *
+
