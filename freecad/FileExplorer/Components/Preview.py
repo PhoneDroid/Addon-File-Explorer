@@ -13,10 +13,9 @@ from ..Qt.Gui import QPixmap
 
 
 class PreviewPanel(QLabel):
-
-    '''
+    """
     Preview Widget
-    '''
+    """
 
     _state: State
 
@@ -25,7 +24,7 @@ class PreviewPanel(QLabel):
         self.setObjectName("FileExplorer_Preview")
         self._state = state
         self.init_ui()
-        
+
         state.path_changed.connect(self.onPathChanged)
         state.root_changed.connect(lambda: self.setVisible(False))
 
@@ -41,15 +40,14 @@ class PreviewPanel(QLabel):
         self.setVisible(False)
 
         try:
-
             info = QFileInfo(file)
 
             if not info.exists():
                 return
-            
+
             if info.isDir():
                 return
-            
+
             file = info.absoluteFilePath()
 
             if isSupportedImage(file):
@@ -63,9 +61,9 @@ class PreviewPanel(QLabel):
                 if pixmap and not pixmap.isNull():
                     self.show_image_preview(pixmap)
                     return
-                
+
         except Exception as exception:
-            print('Failed to update preview',file,exception)
+            print("Failed to update preview", file, exception)
             self.setVisible(True)
             return
 

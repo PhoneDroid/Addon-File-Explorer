@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-from ..Favorites import DuplicatedFavoriteError , FavoritesModel , Favorite
+from ..Favorites import DuplicatedFavoriteError, FavoritesModel, Favorite
 from ..History import ChangeState
 from ..State import State
 from ..Intl import tr
@@ -29,10 +29,9 @@ Role = Qt.ItemDataRole
 
 
 class FavoritesWidget(QListView):
-
-    '''
+    """
     Favorites Widget
-    '''
+    """
 
     _model: FavoritesModel
     _state: State
@@ -62,8 +61,7 @@ class FavoritesWidget(QListView):
         state._history.on_change.connect(self.onHistoryChange)
 
     def onHistoryChange(self, details: ChangeState) -> None:
-        
-        path = details['current']
+        path = details["current"]
 
         # print('Favorites::UserNavigate',path)
 
@@ -71,27 +69,24 @@ class FavoritesWidget(QListView):
 
         if index:
             self.selectIndex(index)
-            
-    def selectIndex ( self , index : QModelIndex ):
 
+    def selectIndex(self, index: QModelIndex):
         if not index.isValid():
             pass
 
-        self.selectionModel().select(index, \
-            QItemSelectionModel.SelectionFlag.ClearAndSelect)
+        self.selectionModel().select(index, QItemSelectionModel.SelectionFlag.ClearAndSelect)
 
     def on_activated(self, index: QModelIndex) -> None:
-
         if not index.isValid():
             return
-        
+
         favorite = self._model.getItem(index.row())
 
         if not favorite:
             return
-        
+
         path = favorite.path
-        
+
         self._state.user_navigate.emit(path)
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:

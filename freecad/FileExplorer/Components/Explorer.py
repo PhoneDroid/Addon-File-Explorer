@@ -15,16 +15,25 @@ from .Favorites import FavoritesWidget
 from .Preview import PreviewPanel
 from .Tree import FileTree
 
-from ..Qt.Widgets import QGraphicsOpacityEffect,QWidgetAction , QPushButton , QVBoxLayout, QStatusBar, QLineEdit, QSplitter, QToolBar , QWidget
+from ..Qt.Widgets import (
+    QGraphicsOpacityEffect,
+    QWidgetAction,
+    QPushButton,
+    QVBoxLayout,
+    QStatusBar,
+    QLineEdit,
+    QSplitter,
+    QToolBar,
+    QWidget,
+)
 from ..Qt.Core import Qt
 from ..Qt.Gui import QIcon
 
 
 class Explorer(QWidget):
-
-    '''
+    """
     Explorer Widget
-    '''
+    """
 
     _state: State
 
@@ -38,11 +47,9 @@ class Explorer(QWidget):
         self._state = State()
         self.init_ui()
 
-        self._state.root_changed.connect(
-            lambda : self.status.showMessage(self.tree.root())
-        )
+        self._state.root_changed.connect(lambda: self.status.showMessage(self.tree.root()))
 
-        self._state.root_changed.emit(self.tree.root(),True)
+        self._state.root_changed.emit(self.tree.root(), True)
         self._state._history._emitChange()
 
     def build_sidebar(self) -> QWidget:
@@ -57,11 +64,7 @@ class Explorer(QWidget):
         toolbar = QToolBar(self)
         toolbar.setObjectName("FileExplorer_ToolBar")
 
-        def action ( 
-            onClick : object ,
-            icon : QIcon ,
-            text : str
-        ):
+        def action(onClick: object, icon: QIcon, text: str):
             button = QPushButton()
             button.clicked.connect(onClick)
             button.setAutoFillBackground(True)
@@ -75,28 +78,19 @@ class Explorer(QWidget):
 
             return action
 
-
         action_back = action(
-            onClick = self._state.navigate_back ,
-            icon = Icons.NavBack ,
-            text = tr("FileExplorer", "Back")
+            onClick=self._state.navigate_back, icon=Icons.NavBack, text=tr("FileExplorer", "Back")
         )
 
-        action_up = action(
-            onClick = self.tree.go_up ,
-            icon = Icons.NavUp ,
-            text = tr("FileExplorer", "Up")
-        )
+        action_up = action(onClick=self.tree.go_up, icon=Icons.NavUp, text=tr("FileExplorer", "Up"))
 
         action_forward = action(
-            onClick = self._state.navigate_forward ,
-            icon = Icons.NavForward ,
-            text = tr("FileExplorer", "Forward")
+            onClick=self._state.navigate_forward,
+            icon=Icons.NavForward,
+            text=tr("FileExplorer", "Forward"),
         )
 
-
-        def setActionState ( action : QWidgetAction , enabled : bool ):
-
+        def setActionState(action: QWidgetAction, enabled: bool):
             action.setEnabled(enabled)
 
             opacity = 1.0 if enabled else 0.5
@@ -108,23 +102,20 @@ class Explorer(QWidget):
 
             widget.setGraphicsEffect(effect)
 
-
-        def onRootChanged ():
-            
+        def onRootChanged():
             file = self.tree.root()
 
             path = Path(file)
 
             enabled = file != path.root
 
-            setActionState(action_up,enabled)
+            setActionState(action_up, enabled)
 
         self._state.root_changed.connect(onRootChanged)
 
-
-        def on_history_change ( details : ChangeState ):
-            setActionState(action_forward,details['hasForward'])
-            setActionState(action_back,details['hasBack'])
+        def on_history_change(details: ChangeState):
+            setActionState(action_forward, details["hasForward"])
+            setActionState(action_back, details["hasBack"])
 
         self._state._history.on_change.connect(on_history_change)
 

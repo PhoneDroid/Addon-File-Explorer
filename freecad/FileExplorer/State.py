@@ -13,14 +13,13 @@ from .Qt.Core import QObject, Signal, QUrl
 from .Qt.Gui import QDesktopServices
 
 
-class State ( QObject ):
-
-    '''
+class State(QObject):
+    """
     Explorer State
-    '''
+    """
 
     user_navigate: Signal = Signal(str)
-    root_changed: Signal = Signal(str,bool)
+    root_changed: Signal = Signal(str, bool)
     path_changed: Signal = Signal(str)
 
     _current_path: str
@@ -39,8 +38,7 @@ class State ( QObject ):
         url = QUrl.fromLocalFile(path)
         QDesktopServices.openUrl(url)
 
-    def onRootChanged(self, path: str,initial : bool) -> None:
-
+    def onRootChanged(self, path: str, initial: bool) -> None:
         # print('State::onRootChanged',initial,path)
 
         if not initial:

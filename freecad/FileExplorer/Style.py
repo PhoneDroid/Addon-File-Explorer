@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-'''
+"""
 Explorer Styling
-'''
+"""
 
 from .Qt.Widgets import QApplication, QStyle
 from .Qt.Gui import QIcon
@@ -14,8 +14,8 @@ fromTheme = QIcon.fromTheme
 pixmaps = QStyle.StandardPixmap
 asIcon = QApplication.style().standardIcon
 
+
 class Icons:
- 
     FavoriteDir = fromTheme("folder", asIcon(pixmaps.SP_DirIcon))
     RootDir = asIcon(pixmaps.SP_ComputerIcon)
     HomeDir = fromTheme("user-home", asIcon(pixmaps.SP_DirHomeIcon))

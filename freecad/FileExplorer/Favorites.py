@@ -151,4 +151,3 @@ class FavoritesModel(QAbstractListModel):
 
     def get_state(self) -> list[tuple[str, str]]:
         return [(f.path, f.name) for f in self._items if f.kind == "user" and f.name]
-

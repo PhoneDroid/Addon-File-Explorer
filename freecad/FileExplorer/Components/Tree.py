@@ -7,7 +7,7 @@ from pathlib import Path
 import FreeCAD as App
 
 from ..History import ChangeState
-from ..Files import duplicate_file, getImporter, import_file, isProject , open_file
+from ..Files import duplicate_file, getImporter, import_file, isProject, open_file
 from ..State import State
 from ..Style import Icons
 from ..Intl import tr
@@ -21,10 +21,9 @@ QDir = QDir
 
 
 class FileTree(QTreeView):
-
-    '''
+    """
     Tree Widget
-    '''
+    """
 
     def __init__(self, state: State, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -35,9 +34,7 @@ class FileTree(QTreeView):
         self._state = state
         self._model = model
 
-        model.rootPathChanged.connect(
-            lambda path : state.root_changed.emit(path,False)
-        )
+        model.rootPathChanged.connect(lambda path: state.root_changed.emit(path, False))
 
         model.setRootPath(state.get_last_path())
         model.setFilter(Filter.AllDirs | Filter.NoDotAndDotDot | Filter.Files)
@@ -60,29 +57,26 @@ class FileTree(QTreeView):
         self.activated.connect(self.on_activated)
         self.clicked.connect(self.on_activated)
 
-    def onUserNavigate ( self , place : str ):
-
+    def onUserNavigate(self, place: str):
         index = self._model.setRootPath(place)
-        
+
         self.setRootIndex(index)
 
-    def onHistoryChange(self, details : ChangeState) -> None:
+    def onHistoryChange(self, details: ChangeState) -> None:
+        path = details["current"]
 
-        path = details['current']
-        
         rootIndex = self._model.setRootPath(path)
         self.setRootIndex(rootIndex)
 
     def on_double_click(self, index: QModelIndex) -> None:
-
         if not index.isValid():
             return
-        
+
         root = self._model.filePath(index)
-        
+
         if not Path(root).is_dir():
             return
-        
+
         self._state.user_navigate.emit(root)
 
     def on_activated(self, index: QModelIndex) -> None:
@@ -152,12 +146,11 @@ class FileTree(QTreeView):
         clipboard.setText(path)
 
     def go_up(self) -> None:
-
         path = Path(self._model.rootPath())
-        
+
         if not path.parent:
             return
-        
+
         self._state.user_navigate.emit(str(path.parent))
 
     def root(self) -> str:
