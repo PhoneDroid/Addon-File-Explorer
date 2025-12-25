@@ -30,7 +30,7 @@ class FileTree(QTreeView):
 
     def __init__(self, state: State, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setObjectName("FileExplorerExt_Tree")
+        self.setObjectName("FileExplorer_Tree")
 
         model = QFileSystemModel(self)
 
@@ -93,40 +93,40 @@ class FileTree(QTreeView):
         if is_fcstd or is_importable:
             menu.addAction(
                 Icons.SysOpen,
-                tr("FileExplorerExt", "Open"),
+                tr("FileExplorer", "Open"),
                 lambda: self._state.open_file(file_path),
             )
 
         if doc and is_importable and not is_fcstd:
             menu.addAction(
                 Icons.Import,
-                tr("FileExplorerExt", "Import into current document"),
+                tr("FileExplorer", "Import into current document"),
                 lambda: self._state.import_file(file_path),
             )
 
         if not is_dir and not is_fcstd:
             menu.addAction(
                 Icons.SysOpen,
-                tr("FileExplorerExt", "Open with Default App"),
+                tr("FileExplorer", "Open with Default App"),
                 lambda: self._state.open_with_sys_app(file_path),
             )
 
         menu.addAction(
             Icons.Copy,
-            tr("FileExplorerExt", "Copy Path"),
+            tr("FileExplorer", "Copy Path"),
             lambda: self.copy_path_to_clipboard(file_path),
         )
 
         if is_dir:
             menu.addAction(
                 Icons.SysOpen,
-                tr("FileExplorerExt", "Browse"),
+                tr("FileExplorer", "Browse"),
                 lambda: self._state.open_with_sys_app(file_path),
             )
         else:
             menu.addAction(
                 Icons.Copy,
-                tr("FileExplorerExt", "Duplicate"),
+                tr("FileExplorer", "Duplicate"),
                 lambda: self._state.duplicate_file(file_path),
             )
 

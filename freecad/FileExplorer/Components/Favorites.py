@@ -54,21 +54,21 @@ class Favorite:
 
 RootDir = Favorite(
     path="",
-    name=tr("FileExplorerExt", "This PC"),
+    name=tr("FileExplorer", "This PC"),
     kind="root",
     order=0,
 )
 
 HomeDir = Favorite(
     path=QDir.homePath(),
-    name=tr("FileExplorerExt", "Home"),
+    name=tr("FileExplorer", "Home"),
     kind="home",
     order=1,
 )
 
 MacrosDir = Favorite(
     path=App.getUserMacroDir(True),
-    name=tr("FileExplorerExt", "Macros"),
+    name=tr("FileExplorer", "Macros"),
     kind="macro",
     order=1,
 )
@@ -185,7 +185,7 @@ class FavoritesWidget(QListView):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
-        self.setObjectName("FileExplorerExt_Favorites")
+        self.setObjectName("FileExplorer_Favorites")
         user_data = [Favorite(path, name) for path, name in state.get_favorites()]
         self._model = FavoritesModel(user_data, self)
         self._state = state
@@ -249,8 +249,8 @@ class FavoritesWidget(QListView):
         except DuplicatedFavoriteError:
             QMessageBox.warning(
                 self,
-                tr("FileExplorerExt", "Duplicated"),
-                tr("FileExplorerExt", "Duplicated favorite"),
+                tr("FileExplorer", "Duplicated"),
+                tr("FileExplorer", "Duplicated favorite"),
             )
 
     def on_context_menu(self, position: QPoint) -> None:
@@ -266,12 +266,12 @@ class FavoritesWidget(QListView):
         menu = QMenu(self)
 
         menu.addAction(
-            tr("FileExplorerExt", "Rename"),
+            tr("FileExplorer", "Rename"),
             lambda: self.rename_favorite(index),
         )
 
         menu.addAction(
-            tr("FileExplorerExt", "Remove from Favorites"),
+            tr("FileExplorer", "Remove from Favorites"),
             lambda: self.remove_favorite(index),
         )
 
@@ -302,8 +302,8 @@ class FavoritesWidget(QListView):
 
         new_name, ok = QInputDialog.getText(
             self,
-            tr("FileExplorerExt", "Rename Favorite"),
-            tr("FileExplorerExt", "Enter new name:"),
+            tr("FileExplorer", "Rename Favorite"),
+            tr("FileExplorer", "Enter new name:"),
             QLineEdit.EchoMode.Normal,
             name,
         )
@@ -315,6 +315,6 @@ class FavoritesWidget(QListView):
         else:
             QMessageBox.warning(
                 self,
-                tr("FileExplorerExt", "File Explorer"),
-                tr("FileExplorerExt", "Cannot rename favorite"),
+                tr("FileExplorer", "File Explorer"),
+                tr("FileExplorer", "Cannot rename favorite"),
             )

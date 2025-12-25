@@ -25,7 +25,7 @@ class PreviewPanel(QLabel):
 
     def __init__(self, state: State, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setObjectName("FileExplorerExt_Preview")
+        self.setObjectName("FileExplorer_Preview")
         self._state = state
         self.init_ui()
         state.path_changed.connect(self.on_state_path_changed)

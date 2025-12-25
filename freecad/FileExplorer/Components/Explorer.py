@@ -56,26 +56,26 @@ class Explorer(QWidget):
 
     def build_top_toolbar(self) -> QToolBar:
         toolbar = QToolBar(self)
-        toolbar.setObjectName("FileExplorerExt_ToolBar")
+        toolbar.setObjectName("FileExplorer_ToolBar")
 
         toolbar.addAction(
             Icons.NavBack,
-            tr("FileExplorerExt", "Back"),
+            tr("FileExplorer", "Back"),
             self._state.navigate_back,
         )
         toolbar.addAction(
             Icons.NavForward,
-            tr("FileExplorerExt", "Forward"),
+            tr("FileExplorer", "Forward"),
             self._state.navigate_forward,
         )
         toolbar.addAction(
             Icons.NavUp,
-            tr("FileExplorerExt", "Up"),
+            tr("FileExplorer", "Up"),
             self.tree.go_up,
         )
 
         filter_input = QLineEdit(self)
-        filter_input.setPlaceholderText(tr("FileExplorerExt", "Filter..."))
+        filter_input.setPlaceholderText(tr("FileExplorer", "Filter..."))
         filter_input.textChanged.connect(self.on_filter_changed)
         toolbar.addSeparator()
         toolbar.addWidget(filter_input)

@@ -17,10 +17,10 @@ class Dock(QDockWidget):
     explorer: Explorer
 
     def __init__(self, parent: QWidget | None = None) -> None:
-        super().__init__(tr("FileExplorerExt", "File Explorer"), parent)
+        super().__init__(tr("FileExplorer", "File Explorer"), parent)
         self.explorer = Explorer(self)
         self.setWidget(self.explorer)
-        self.setObjectName("FileExplorerExt_Dock")
+        self.setObjectName("FileExplorer_Dock")
 
 
 def show() -> None:
