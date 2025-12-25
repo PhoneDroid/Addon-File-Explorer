@@ -25,10 +25,11 @@ class PreviewPanel(QLabel):
         self.setObjectName("FileExplorer_Preview")
         self._state = state
         self.init_ui()
-        state.path_changed.connect(self.on_state_path_changed)
-        state.passive_tree_root_changed.connect(lambda: self.setVisible(False))
+        
+        state.path_changed.connect(self.onPathChanged)
+        state.root_changed.connect(lambda: self.setVisible(False))
 
-    def on_state_path_changed(self, path: str) -> None:
+    def onPathChanged(self, path: str) -> None:
         self.update_preview(path)
 
     def init_ui(self) -> None:

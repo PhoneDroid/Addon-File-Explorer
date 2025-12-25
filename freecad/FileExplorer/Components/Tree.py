@@ -6,10 +6,11 @@ from pathlib import Path
 
 import FreeCAD as App
 
+from ..History import ChangeState
 from ..Files import duplicate_file, getImporter, import_file, isProject , open_file
-from ..Intl import tr
 from ..State import State
 from ..Style import Icons
+from ..Intl import tr
 
 from ..Qt.Widgets import QAbstractItemView, QFileSystemModel, QTreeView, QWidget, QMenu
 from ..Qt.Core import QModelIndex, QPoint, QDir, Qt
@@ -34,9 +35,12 @@ class FileTree(QTreeView):
         self._state = state
         self._model = model
 
-        model.rootPathChanged.connect(state.passive_tree_root_changed)
-        model.setFilter(Filter.AllDirs | Filter.NoDotAndDotDot | Filter.Files)
+        model.rootPathChanged.connect(
+            lambda path : state.root_changed.emit(path,False)
+        )
+
         model.setRootPath(state.get_last_path())
+        model.setFilter(Filter.AllDirs | Filter.NoDotAndDotDot | Filter.Files)
         model.setNameFilterDisables(False)
 
         self.setModel(model)
@@ -49,24 +53,37 @@ class FileTree(QTreeView):
         self.setUniformRowHeights(True)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
+        self.customContextMenuRequested.connect(self.on_context_menu)
+        self._state._history.on_change.connect(self.onHistoryChange)
+        self._state.user_navigate.connect(self.onUserNavigate)
+        self.doubleClicked.connect(self.on_double_click)
         self.activated.connect(self.on_activated)
         self.clicked.connect(self.on_activated)
-        self.doubleClicked.connect(self.on_double_click)
-        self.customContextMenuRequested.connect(self.on_context_menu)
-        self._state.favorite_selected.connect(self.on_favorite_selected)
 
-    def on_favorite_selected(self, path: str) -> None:
+    def onUserNavigate ( self , place : str ):
+
+        index = self._model.setRootPath(place)
+        
+        self.setRootIndex(index)
+
+    def onHistoryChange(self, details : ChangeState) -> None:
+
+        path = details['current']
+        
         rootIndex = self._model.setRootPath(path)
         self.setRootIndex(rootIndex)
-        self._state.tree_root_changed.emit(path)
 
     def on_double_click(self, index: QModelIndex) -> None:
-        if index.isValid():
-            root = self._model.filePath(index)
-            if Path(root).is_dir():
-                rootIndex = self._model.setRootPath(root)
-                self.setRootIndex(rootIndex)
-                self._state.tree_root_changed.emit(root)
+
+        if not index.isValid():
+            return
+        
+        root = self._model.filePath(index)
+        
+        if not Path(root).is_dir():
+            return
+        
+        self._state.user_navigate.emit(root)
 
     def on_activated(self, index: QModelIndex) -> None:
         if index.isValid():
@@ -135,11 +152,13 @@ class FileTree(QTreeView):
         clipboard.setText(path)
 
     def go_up(self) -> None:
+
         path = Path(self._model.rootPath())
-        if path.parent:
-            rootIndex = self._model.setRootPath(str(path.parent))
-            self.setRootIndex(rootIndex)
-            self._state.tree_root_changed.emit(str(path.parent))
+        
+        if not path.parent:
+            return
+        
+        self._state.user_navigate.emit(str(path.parent))
 
     def root(self) -> str:
         return self._model.rootPath()

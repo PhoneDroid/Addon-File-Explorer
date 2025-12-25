@@ -3,6 +3,7 @@
 # SPDX-FileNotice: Part of the File Explorer addon.
 
 from ..Favorites import DuplicatedFavoriteError , FavoritesModel , Favorite
+from ..History import ChangeState
 from ..State import State
 from ..Intl import tr
 
@@ -58,21 +59,40 @@ class FavoritesWidget(QListView):
         self.activated.connect(self.on_activated)
         self.clicked.connect(self.on_activated)
 
-        state.tree_root_changed.connect(self.on_tree_root_changed)
+        state._history.on_change.connect(self.onHistoryChange)
 
-    def on_tree_root_changed(self, path: str) -> None:
+    def onHistoryChange(self, details: ChangeState) -> None:
+        
+        path = details['current']
+
+        print('Favorites::UserNavigate',path)
+
         index = self._model.findIndex(path)
-        if index and index.isValid():
-            self.selectionModel().select(index, QItemSelectionModel.SelectionFlag.ClearAndSelect)
+
+        if index:
+            self.selectIndex(index)
+            
+    def selectIndex ( self , index : QModelIndex ):
+
+        if not index.isValid():
+            pass
+
+        self.selectionModel().select(index, \
+            QItemSelectionModel.SelectionFlag.ClearAndSelect)
 
     def on_activated(self, index: QModelIndex) -> None:
-        if index.isValid():
-            path = self._model.getItem(index.row())
 
-            if not path:
-                return
+        if not index.isValid():
+            return
+        
+        favorite = self._model.getItem(index.row())
 
-            self._state.favorite_selected.emit(path.path)
+        if not favorite:
+            return
+        
+        path = favorite.path
+        
+        self._state.user_navigate.emit(path)
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         if event.mimeData().hasUrls() or event.mimeData().hasText():

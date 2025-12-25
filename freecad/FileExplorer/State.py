@@ -2,8 +2,6 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-
-
 import json
 from pathlib import Path
 
@@ -21,9 +19,8 @@ class State ( QObject ):
     Explorer State
     '''
 
-    passive_tree_root_changed: Signal = Signal(str)
-    favorite_selected: Signal = Signal(str)
-    tree_root_changed: Signal = Signal(str)
+    user_navigate: Signal = Signal(str)
+    root_changed: Signal = Signal(str,bool)
     path_changed: Signal = Signal(str)
 
     _current_path: str
@@ -33,7 +30,7 @@ class State ( QObject ):
         super().__init__(parent)
         self._current_path = ""
         self._history = History()
-        self.passive_tree_root_changed.connect(self.on_passive_tree_root_changed)
+        self.root_changed.connect(self.onRootChanged)
 
     def get_last_path(self) -> str:
         return self._current_path or str(Path.home())
@@ -42,16 +39,20 @@ class State ( QObject ):
         url = QUrl.fromLocalFile(path)
         QDesktopServices.openUrl(url)
 
-    def on_passive_tree_root_changed(self, path: str) -> None:
-        self._history.add(path)
+    def onRootChanged(self, path: str,initial : bool) -> None:
+
+        print('State::onRootChanged',initial,path)
+
+        if not initial:
+            self._history.add(path)
 
     def navigate_back(self) -> None:
-        if back := self._history.go_back():
-            self.favorite_selected.emit(back)
+        print('State::NavigateBack')
+        self._history.go_back()
 
     def navigate_forward(self) -> None:
-        if forward := self._history.go_forward():
-            self.favorite_selected.emit(forward)
+        print('State::NavigateForward')
+        self._history.go_forward()
 
     def get_favorites(self) -> list[tuple[str, str]]:
         path = Path(App.getUserConfigDir()) / "file_explorer.json"

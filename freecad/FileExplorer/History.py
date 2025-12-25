@@ -2,37 +2,75 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-'''
-History Navigation
-'''
+from .Qt.Core import QObject , Signal
+from typing import TypedDict
 
 
-class History:
+class ChangeState ( TypedDict ):
+    hasForward : bool
+    hasBack : bool
+    current : str
 
+
+class History ( QObject ):
+
+    '''
+    Explorer History
+    '''
+
+    on_change = Signal(ChangeState)
+
+    current : None | str = None
     forward : list[str] = []
     back: list[str] = []
+
+    def _emitChange ( self ):
+
+        details = {
+            'hasForward' : bool( self.forward ) ,
+            'hasBack' : bool( self.back ) ,
+            'current' : self.current
+        }
+
+        self.on_change.emit(details)
 
     def last ( self ) -> None | str :
         return self.back[-1] if self.back else None
 
     def add(self, path: str) -> None:
-        if self.last() != path:
-            self.back.append(path)
 
-    def go_back(self) -> str | None:
+        if path != self.current:
+            
+            print('History::Add',path)
+
+            if self.current:
+                self.back.append(self.current)
+
+            self.current = path
+
+        self._emitChange()
+
+    def go_back(self):
 
         if not self.back:
-            return None
+            pass
 
-        item = self.back.pop()
-        self.forward.append(item)
-        return item
+        if self.current:
+            self.forward.append(self.current)
 
-    def go_forward(self) -> str | None:
+        self.current = self.back.pop()
+
+
+        self._emitChange()
+
+    def go_forward(self):
 
         if not self.forward:
-            return None
+            pass
 
-        item = self.forward.pop()
-        self.back.append(item)
-        return item
+        if self.current:
+            self.back.append(self.current)
+
+        self.current = self.forward.pop()
+
+        self._emitChange()
