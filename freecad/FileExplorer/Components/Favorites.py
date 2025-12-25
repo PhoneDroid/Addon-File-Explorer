@@ -65,7 +65,7 @@ class FavoritesWidget(QListView):
         
         path = details['current']
 
-        print('Favorites::UserNavigate',path)
+        # print('Favorites::UserNavigate',path)
 
         index = self._model.findIndex(path)
 

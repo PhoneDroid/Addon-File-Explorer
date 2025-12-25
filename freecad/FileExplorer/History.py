@@ -41,7 +41,7 @@ class History ( QObject ):
 
         if path != self.current:
 
-            print('History::Add',path)
+            # print('History::Add',path)
 
             if self.current:
                 self.back.append(self.current)

@@ -41,17 +41,17 @@ class State ( QObject ):
 
     def onRootChanged(self, path: str,initial : bool) -> None:
 
-        print('State::onRootChanged',initial,path)
+        # print('State::onRootChanged',initial,path)
 
         if not initial:
             self._history.add(path)
 
     def navigate_back(self) -> None:
-        print('State::NavigateBack')
+        # print('State::NavigateBack')
         self._history.go_back()
 
     def navigate_forward(self) -> None:
-        print('State::NavigateForward')
+        # print('State::NavigateForward')
         self._history.go_forward()
 
     def get_favorites(self) -> list[tuple[str, str]]:
