@@ -2,9 +2,10 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-"""
-FileExplorerExt: Translation.
-"""
+'''
+Translation Helpers.
+'''
+
 
 from FreeCAD import Qt
 

@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-"""
-FileExplorerExt: Application style.
-"""
+'''
+Explorer Styling
+'''
 
 from .Qt.Widgets import QApplication, QStyle
 from .Qt.Gui import QIcon

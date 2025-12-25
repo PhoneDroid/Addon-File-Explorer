@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-"""
-FileExplorerExt: Main Widget.
-"""
+'''
+Explorer Widget
+'''
 
 from __future__ import annotations
 

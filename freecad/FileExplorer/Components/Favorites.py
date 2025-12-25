@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-"""
-FileExplorerExt: Favorites.
-"""
+'''
+Favorites Widget
+'''
 
 from dataclasses import dataclass
 from pathlib import Path

@@ -2,9 +2,9 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-"""
-FileExplorerExt: File Tree.
-"""
+'''
+Tree Widget
+'''
 
 from pathlib import Path
 
