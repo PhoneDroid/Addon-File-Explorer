@@ -1,7 +1,7 @@
 [project]
-name = "FileExplorerExt"
-version = "1.0.0.dev0"
-description = "FreeCAD File Explorer"
+name = "FileExplorer"
+version = "1.0.0-dev.0"
+description = "Integrated file system viewer."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []

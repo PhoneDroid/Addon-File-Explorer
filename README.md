@@ -2,7 +2,7 @@
 
 This is a small Addon to bring an internal file explorer to FreeCAD with integrated actions.
 
-![Screenshot](freecad/FileExplorerExt/resources/screenshot.png)
+![Screenshot](freecad/FileExplorer/resources/screenshot.png)
 
 # Features
 
