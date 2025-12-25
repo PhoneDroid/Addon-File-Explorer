@@ -40,11 +40,13 @@ class History ( QObject ):
     def add(self, path: str) -> None:
 
         if path != self.current:
-            
+
             print('History::Add',path)
 
             if self.current:
                 self.back.append(self.current)
+
+            self.forward.clear()
 
             self.current = path
 
