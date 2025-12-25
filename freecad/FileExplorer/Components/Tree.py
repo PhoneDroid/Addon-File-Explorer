@@ -58,6 +58,7 @@ class FileTree(QTreeView):
     def on_favorite_selected(self, path: str) -> None:
         rootIndex = self._model.setRootPath(path)
         self.setRootIndex(rootIndex)
+        self._state.tree_root_changed.emit(path)
 
     def on_double_click(self, index: QModelIndex) -> None:
         if index.isValid():
