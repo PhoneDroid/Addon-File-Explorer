@@ -2,10 +2,6 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-'''
-Preview Widget
-'''
-
 import zipfile
 
 from ..Files import isProject, isSupportedImage
@@ -17,9 +13,10 @@ from ..Qt.Gui import QPixmap
 
 
 class PreviewPanel(QLabel):
-    """
-    Preview Widget.
-    """
+
+    '''
+    Preview Widget
+    '''
 
     _state: State
 

@@ -2,15 +2,11 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-'''
-Tree Widget
-'''
-
 from pathlib import Path
 
 import FreeCAD as App
 
-from ..Files import getImporter, isProject
+from ..Files import duplicate_file, getImporter, import_file, isProject , open_file
 from ..Intl import tr
 from ..State import State
 from ..Style import Icons
@@ -24,9 +20,10 @@ QDir = QDir
 
 
 class FileTree(QTreeView):
-    """
-    File Tree Widget.
-    """
+
+    '''
+    Tree Widget
+    '''
 
     def __init__(self, state: State, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -94,14 +91,14 @@ class FileTree(QTreeView):
             menu.addAction(
                 Icons.SysOpen,
                 tr("FileExplorer", "Open"),
-                lambda: self._state.open_file(file_path),
+                lambda: open_file(file_path),
             )
 
         if doc and is_importable and not is_fcstd:
             menu.addAction(
                 Icons.Import,
                 tr("FileExplorer", "Import into current document"),
-                lambda: self._state.import_file(file_path),
+                lambda: import_file(file_path),
             )
 
         if not is_dir and not is_fcstd:
@@ -127,7 +124,7 @@ class FileTree(QTreeView):
             menu.addAction(
                 Icons.Copy,
                 tr("FileExplorer", "Duplicate"),
-                lambda: self._state.duplicate_file(file_path),
+                lambda: duplicate_file(file_path),
             )
 
         menu.exec(self.mapToGlobal(position))

@@ -2,31 +2,29 @@
 # SPDX-FileCopyrightText: 2025 Frank David Martínez Muñoz
 # SPDX-FileNotice: Part of the File Explorer addon.
 
-'''
-Explorer State
-'''
+
 
 import json
 from pathlib import Path
 
 import FreeCAD as App
 
-from .Files import duplicate_file, import_file, open_file
 from .History import History
 
 from .Qt.Core import QObject, Signal, QUrl
 from .Qt.Gui import QDesktopServices
 
 
-class State(QObject):
-    """
-    Main State Controller.
-    """
+class State ( QObject ):
 
-    path_changed: Signal = Signal(str)
+    '''
+    Explorer State
+    '''
+
+    passive_tree_root_changed: Signal = Signal(str)
     favorite_selected: Signal = Signal(str)
     tree_root_changed: Signal = Signal(str)
-    passive_tree_root_changed: Signal = Signal(str)
+    path_changed: Signal = Signal(str)
 
     _current_path: str
     _history: History
@@ -43,15 +41,6 @@ class State(QObject):
     def open_with_sys_app(self, path: str) -> None:
         url = QUrl.fromLocalFile(path)
         QDesktopServices.openUrl(url)
-
-    def import_file(self, path: str) -> None:
-        import_file(path)
-
-    def open_file(self, path: str) -> None:
-        open_file(path)
-
-    def duplicate_file(self, path: str) -> None:
-        duplicate_file(path)
 
     def on_passive_tree_root_changed(self, path: str) -> None:
         self._history.add(path)
