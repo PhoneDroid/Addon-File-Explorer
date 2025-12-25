@@ -6,101 +6,130 @@
 FileExplorerExt: File utils.
 """
 
-import re
-import shutil
 from pathlib import Path
+from shutil import copy2
+from re import match
 
-import FreeCAD as App
 import FreeCADGui as Gui
+import FreeCAD as App
 
 from .Qt.Gui import QImageReader
 
-SUPPORTED_IMAGE_FORMATS = set(
-    [f".{f.toStdString()}".lower() for f in QImageReader.supportedImageFormats()]
+Supported_Formats = set(
+    format.toStdString() for format in QImageReader.supportedImageFormats()
 )
 
+def getSuffix ( file : str ) -> str :
+    return Path(file).suffix[1:]
 
-def is_image_file(file_path: str) -> bool:
-    """Return True if Qt can read the image format."""
-    path = Path(file_path)
-    return ((path.suffix or "").lower() in SUPPORTED_IMAGE_FORMATS) and path.exists()
+def isSupportedImage ( file : str ) -> bool :
+    return getSuffix(file) in Supported_Formats
 
-
-def is_fcstd_file(file_path: str) -> bool:
-    """Return True if file_path is a FCStd file."""
-    return file_path.lower().endswith(".fcstd") and Path(file_path).exists()
+def isProject ( file : str ) -> bool :
+    return getSuffix(file) == 'fcstd'
 
 
-def get_import_module(path: str) -> str | None:
-    """Return the module to import path if any."""
-    ext = (path.split(".")[-1] or "").lower()
-    modules = App.getImportType(ext)
-    if modules and type(modules) == list:
-        return modules[0]
+def getImporter ( file : str ) -> str | None :
+    
+    suffix = getSuffix(file)
+
+    modules = App.getImportType(suffix)
+
+    if type(modules) == list:
+        return modules[ 0 ]
+    
     return None
 
 
-def open_file(file_path: str) -> None:
-    ext = (file_path.split(".")[-1] or "").lower()
-    if ext == "fcstd":
-        App.openDocument(file_path)
-    else:
-        module = get_import_module(file_path)
-        if module:
-            try:
-                from freecad import module_io
-            except ImportError:
-                Gui.insert(file_path)
-            else:
-                module_io.OpenInsertObject(module, file_path, "open")
-        else:
-            App.Console.PrintWarning(f"File type not supported: {file_path}\n")
+def open_file ( file : str ) -> None:
 
+    if isProject(file):
+        App.openDocument(file)
+        return
+    
+    module = getImporter(file)
 
-def import_file(file_path: str) -> None:
-    ext = (file_path.split(".")[-1] or "").lower()
-
-    doc_name = App.ActiveDocument.Name if App.ActiveDocument else None
-
-    if not doc_name:
+    if not module:
+        App.Console.PrintWarning(f'File type not supported: {file}\n')
         return
 
-    if ext == "fcstd":
-        Gui.insert(file_path, doc_name)
+    try:
 
-    module = get_import_module(file_path)
-    if module:
-        try:
-            from freecad import module_io
-        except ImportError:
-            Gui.insert(file_path, doc_name)
-        else:
-            module_io.OpenInsertObject(
-                module,
-                file_path,
-                "insert",
-                doc_name,
-            )
-    else:
-        App.Console.PrintWarning(f"File type not supported: {file_path}\n")
+        from freecad import module_io
+
+        module_io.OpenInsertObject(module,file,'open')
+
+    except ImportError:
+        Gui.insert(file)
 
 
-def duplicate_file(file: str) -> None:
+def import_file ( file : str ) -> None :
+
+    name = App.ActiveDocument.Name if App.ActiveDocument else None
+
+    if not name:
+        return
+    
+    if isProject(file):
+        Gui.insert(file, name)
+
+    module = getImporter(file)
+
+    if not module:
+        App.Console.PrintWarning(f"File type not supported: {file}\n")
+        return
+
+    try:
+
+        from freecad import module_io
+
+        module_io.OpenInsertObject(
+            module,
+            file,
+            "insert",
+            name,
+        )
+
+    except ImportError:
+        Gui.insert(file, name)
+
+
+def duplicate_file ( file : str ) -> bool :
+
     path = Path(file)
-    if not path.exists() or not path.is_file():
-        return
-    base = path.stem
-    ext = path.suffix
-    m = re.match(r"(.*?)(\d+)$", base)
-    num = 1
-    if m:
-        base, num = m.groups()
-        num = int(num) + 1
-    else:
-        base += "."
 
-    copy = path.parent / f"{base}{num}{ext}"
-    while copy.exists():
-        num += 1
-        copy = path.parent / f"{base}{num}{ext}"
-    shutil.copy2(str(path), str(copy))
+    try:
+        
+        if not path.exists():
+            return False
+        
+        if not path.is_file():
+            return False
+        
+        suffix = path.suffix
+        stem = path.stem
+
+        matched = match(r'(.*?)(\d+)$',stem)
+        
+        index = 1
+        stem += '.'
+        
+        if matched:
+            stem , index = matched.groups()
+            index = int( index ) + 1
+
+        copy = path.parent / f'{ stem }{ index }{ suffix }'
+        
+        while copy.exists():
+            index += 1
+            copy = path.parent / f'{ stem }{ index }{ suffix }'
+
+        copy2(path,copy)
+
+        return True
+    
+    except Exception as exception:
+
+        print('Failed to duplicate file',file,exception)
+
+        return False

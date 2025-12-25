@@ -8,7 +8,7 @@ FileExplorerExt: Preview Widget
 
 import zipfile
 
-from ..Files import is_fcstd_file, is_image_file
+from ..Files import isProject, isSupportedImage
 from ..State import State
 
 from ..Qt.Widgets import QWidget, QLabel
@@ -39,24 +39,37 @@ class PreviewPanel(QLabel):
         self.setVisible(False)
         self.setStyleSheet("QLabel { background-color: white; }")
 
-    def update_preview(self, file_path: str) -> None:
+    def update_preview(self, file: str) -> None:
         self.setVisible(False)
 
-        info = QFileInfo(file_path)
-        if not info.exists() or info.isDir():
+        try:
+
+            info = QFileInfo(file)
+
+            if not info.exists():
+                return
+            
+            if info.isDir():
+                return
+            
+            file = info.absoluteFilePath()
+
+            if isSupportedImage(file):
+                pixmap = QPixmap(file)
+                if not pixmap.isNull():
+                    self.show_image_preview(pixmap)
+                    return
+
+            if isProject(file):
+                pixmap = self.get_fcstd_preview(file)
+                if pixmap and not pixmap.isNull():
+                    self.show_image_preview(pixmap)
+                    return
+                
+        except Exception as exception:
+            print('Failed to update preview',file,exception)
+            self.setVisible(True)
             return
-
-        if is_image_file(info.absoluteFilePath()):
-            pixmap = QPixmap(info.absoluteFilePath())
-            if not pixmap.isNull():
-                self.show_image_preview(pixmap)
-                return
-
-        if is_fcstd_file(info.absoluteFilePath()):
-            pixmap = self.get_fcstd_preview(info.absoluteFilePath())
-            if pixmap and not pixmap.isNull():
-                self.show_image_preview(pixmap)
-                return
 
     def show_image_preview(self, pixmap: QPixmap) -> None:
         """Display image preview scaled to available width."""

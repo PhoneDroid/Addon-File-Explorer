@@ -10,7 +10,7 @@ from pathlib import Path
 
 import FreeCAD as App
 
-from ..Files import get_import_module, is_fcstd_file
+from ..Files import getImporter, isProject
 from ..Intl import tr
 from ..State import State
 from ..Style import Icons
@@ -83,9 +83,9 @@ class FileTree(QTreeView):
             return
 
         file_path = self._model.filePath(index)
-        is_fcstd = is_fcstd_file(file_path)
+        is_fcstd = isProject(file_path)
         is_dir = Path(file_path).is_dir()
-        is_importable = not is_dir and get_import_module(file_path)
+        is_importable = not is_dir and getImporter(file_path)
         doc = App.ActiveDocument
 
         menu = QMenu(self)
